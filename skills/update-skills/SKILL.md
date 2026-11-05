@@ -5,18 +5,15 @@ description: 更新已安装的 Mino 技能，以及在使用技能时发现说�
 
 # 更新技能与反馈问题
 
-技能不是一次写完的：Mino 的 Scout、Nexus、Workbench 在变，技能也跟着变。技能放在 `https://github.com/pengchengluoyi/mino.git`，用 git 更新。
+技能不是一次写完的：Mino 的 Scout、Nexus、Workbench 在变，技能也跟着变。对话里用的是 `~/.claude/skills/` 下每个技能目录里的 `SKILL.md`。仓库 `https://github.com/pengchengluoyi/mino.git` 只用来拉取新版本，再复制进来。
 
 ## 怎么知道装的是什么版本
 
-技能仓库的根目录有 `VERSION` 和 `CHANGELOG.md`。克隆目录默认是 `~/.mino/skills-src`：
-
 ```bash
-cat ~/.mino/skills-src/VERSION
-git -C ~/.mino/skills-src log --oneline -5
+cat ~/.claude/skills/VERSION
 ```
 
-`CHANGELOG.md` 每个版本会写**需要的 Scout / Nexus 版本**。技能说的和你实际遇到的对不上，先看是不是版本不匹配：
+`~/.claude/skills/CHANGELOG.md` 每个版本会写**需要的 Scout / Nexus 版本**。技能说的和你实际遇到的对不上，先看是不是版本不匹配：
 
 ```bash
 mino-scout --version      # 如果没有此参数，就读 mino_scout/VERSION 或用 mino-scout status
@@ -26,13 +23,12 @@ mino-scout --version      # 如果没有此参数，就读 mino_scout/VERSION �
 
 ```bash
 git -C ~/.mino/skills-src pull --ff-only
-cat ~/.mino/skills-src/CHANGELOG.md | head -40
+rm -rf ~/.claude/skills/check-test-cases ~/.claude/skills/onboarding ~/.claude/skills/overview ~/.claude/skills/repo-config ~/.claude/skills/run-test-cases ~/.claude/skills/update-skills ~/.claude/skills/write-test-cases
+cp -R ~/.mino/skills-src/skills/. ~/.claude/skills/
+cp ~/.mino/skills-src/VERSION ~/.mino/skills-src/CHANGELOG.md ~/.claude/skills/
 ```
 
-- 技能是按软链接安装的（推荐，`ls -l ~/.claude/skills` 里每项都指向 `skills-src`），`pull` 完就是最新，**不用再复制**；
-- 是复制安装的，把 `skills-src/skills/` 下的目录重新复制过去覆盖；
-- `pull` 提示本地有改动或不能快进：停下告诉用户，**不要 `reset --hard`、不要 force**；
-- 更新后告诉用户 `CHANGELOG` 里这次变了什么，并说明**需要新开一个会话**，新内容才会被加载。
+仓库还没克隆时，先 `git clone https://github.com/pengchengluoyi/mino.git ~/.mino/skills-src`。`pull` 提示本地有改动或不能快进：停下告诉用户，**不要 `reset --hard`、不要 force**。更新后告诉用户 `~/.claude/skills/CHANGELOG.md` 里这次变了什么，并说明**需要新开一个会话**，新内容才会被加载。
 
 ## 发现技能有问题怎么办
 

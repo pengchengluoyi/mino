@@ -23,7 +23,7 @@ Nexus 管用例、设备、账号、任务、会话；Scout 在用户电脑上�
    | `platform` / `model` / `node_name` | 用来和用例要求的平台匹配、向用户说明 |
 
    规则：只选 `executable=true` 且平台和用例一致的设备；有多台就列给用户或按用户指定的选；web 设备不会被独占：一台 Scout 同时可以开最多 4 个浏览器会话（4 个并行槽位），所以 `busy_task_id` 始终为空，要看 `web_parallel_full`（4 个都占满才不能再派）；全部 `busy` 就告诉用户谁占着（`busy_task_id`），**不要抢占、不要硬跑**；设备被隔离（`isolation`）时先按 §2 的隔离流程处理。设备是否空闲只由 Nexus 给出，Scout 不会替你判断。
-2. `case_run(app_id, sn, case_ids, revision=<sha>)` → 立即返回 `task_id`（异步）。只跑脚本仓里的脚本。不要传 `action_scheme`，没有 copilot，也没有外部自行执行。`revision` 是已 push 的 commit，可省略（省略时 Scout 取分支最新）；Nexus 不经手脚本仓库，由设备所在的 Scout 用它本机的 git 凭据自己拉取；
+2. `case_run(app_id, sn, case_ids, revision=<sha>)` → 立即返回 `task_id`（异步）。脚本在项目脚本仓里，由 Scout 拉取该提交后执行。`revision` 是已 push 的 commit，可省略（省略时 Scout 取分支最新）；Nexus 不经手脚本仓库，由设备所在的 Scout 用它本机的 git 凭据自己拉取；
 3. 轮询 `task_get(task_id)`，两次查询间隔 ≥5s；用工具调用本身的等待，不要阻塞式 `sleep`；
 4. 终态即停止；过程证据读 `session_events(session_id)`。
 
@@ -50,7 +50,7 @@ Nexus 管用例、设备、账号、任务、会话；Scout 在用户电脑上�
 ## 2. 读结果
 
 - `task_get`：`status`、`cases[]`、`pass_rate`、`resource_isolated`；
-- `session_events`：字段含义以实际返回为准。`tool/call` 与 `tool/result` 成对，`tool/result` 的 `app` 标明是哪个应用的动作，`node/enter`、`node/leave` 对应脚本里的 do/check 标题。
+- `session_events`：字段含义以实际返回为准。`tool/call` 与 `tool/result` 成对，`tool/result` 的 `app` 标明是哪个应用的动作，`node/enter`、`node/leave` 对应脚本里的 do/check 标题。`capability_id=hierarchy` 的 `nodes`（没有则 `hierarchy_text`）是这次 Scout 读到的界面结构，写页面定位只用它；截图用 `session_screenshot`。
 
 需要特别处理的 `reason_code`：
 

@@ -1,6 +1,6 @@
 ---
 name: onboarding
-description: 让 Mino 的任务能跑起来所需的前置步骤：在 Workbench 注册登录、生成 MCP token 接入 agent、给有设备的电脑安装 Scout 节点并用 MCP 补齐 Chromium 等渠道程序、准备项目与脚本仓库。用户第一次使用 Mino、agent 连不上 Nexus（没有 Mino 工具或 401）、或要新增一台测试电脑时使用。
+description: 让 Mino 的任务能跑起来所需的前置步骤：在 Workbench 注册登录、用 OAuth 把 agent 接到 MCP、给有设备的电脑安装 Scout 节点并用 MCP 补齐 Chromium 等渠道程序、准备项目与脚本仓库。用户第一次使用 Mino、agent 连不上 Nexus（没有 Mino 工具或需要授权）、或要新增一台测试电脑时使用。
 ---
 
 # 上手：注册、接入、装节点
@@ -9,7 +9,7 @@ description: 让 Mino 的任务能跑起来所需的前置步骤：在 Workbench
 
 ## 谁来操作
 
-注册、生成 token、复制安装命令这几步在 **Workbench 网页**里完成，由**用户在自己的浏览器里操作**。你的工作是给出完整网址和每一步要点什么，等用户确认，再核对结果。
+注册、在授权页点允许、复制安装命令这几步在 **浏览器**里完成，由**用户操作**。你的工作是给出完整网址和每一步要点什么，等用户确认，再核对结果。
 
 - 邮箱和密码属于用户：不要替用户编邮箱和密码，不要把密码写进文件、记忆或回复；
 - 页面和说明对不上、要二次验证、遇到验证码：让用户告诉你现在看到了什么，不要猜、不要反复重试；
@@ -17,11 +17,11 @@ description: 让 Mino 的任务能跑起来所需的前置步骤：在 Workbench
 
 ## 敏感信息
 
-MCP token 和 Scout 安装命令（里面带一次性安装凭证）都**只在生成时显示一次**，等同密码：
+Scout 安装命令里的一次性安装凭证只在生成时显示一次，等同密码：
 
-- 只用于下面的接入操作，不要贴进回复正文、日志、提交或记忆；
-- 不要去读数据库、配置目录或浏览器存储来找 token；丢了就在 Workbench 重新生成；
-- 用完告诉用户“已接入”，不要复述 token 内容。
+- 只用于安装那一台节点，不要贴进回复正文、日志、提交或记忆；
+- 不要去读数据库、配置目录或浏览器存储来找它；过期了就在 Workbench 重新生成安装命令；
+- 用完告诉用户“已接入”，不要复述命令里的凭证。
 
 ## Nexus 地址
 
@@ -42,15 +42,27 @@ MCP token 和 Scout 安装命令（里面带一次性安装凭证）都**只在�
 
 确认：登录后进入 Workbench 首页（项目列表）。
 
-## 二、生成 MCP token，接入你自己
+## 二、用 OAuth 接入你自己
 
-1. 打开 `<NEXUS>/assistant?tab=mcp`（助手页的 MCP 区块）；
-2. 点生成 token，**起一个能认出用途的名字**（如 `claude-code-<电脑名>`），确认；
-3. 页面显示一次接入命令，形如 `claude mcp add --transport http mino '<MCP 地址>' --header 'Authorization: Bearer <token>'`（也有 JSON 配置形式，给其他客户端用）；
-4. 你是 Claude Code 就在终端执行这条命令；其他 agent 工具用 JSON 配置写入它自己的 MCP 配置；
-5. 重启会话（或在 agent 里刷新 MCP 连接），确认出现名字以 `agent_guide`、`project_list`、`case_list` 开头的 Mino 工具。**第一件事调 `agent_guide`**，它是总入口。
+MCP 地址是 `<NEXUS>/mcp`。配置里只写这个地址。
 
-确认：`project_list` 能返回项目（空列表也算通）。返回 401：token 无效或被吊销，回到第 1 步重新生成；token 页打不开或提示未就绪：助手功能没启用，告诉用户让管理员处理。
+Claude Code：
+
+```bash
+claude mcp add --transport http mino '<NEXUS>/mcp'
+```
+
+其他客户端写成：
+
+```json
+{ "mcpServers": { "mino": { "type": "http", "url": "<NEXUS>/mcp" } } }
+```
+
+客户端连上后会打开浏览器。页面要求登录时，用刚才的 Workbench 账号登录，然后点允许。允许之后，这个客户端就以该账号调用 Mino。客户端自己保存并刷新凭证。
+
+重启会话（或在 agent 里刷新 MCP 连接），确认出现名字以 `agent_guide`、`project_list`、`case_list` 开头的 Mino 工具。**第一件事调 `agent_guide`**，它是总入口。
+
+确认：`project_list` 能返回项目（空列表也算通）。客户端停在需要授权：重新连接，让用户在浏览器里点允许。授权记录在 `<NEXUS>/assistant?tab=mcp`，可以吊销某一个客户端。助手功能没启用时告诉用户让管理员处理。
 
 ## 三、给有设备的电脑装 Scout
 
