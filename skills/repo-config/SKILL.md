@@ -98,4 +98,4 @@ Nexus 不读脚本仓库（仓库可能是私有的），它只能靠你告诉�
 | mac | `ax` |
 | win | `uia` |
 
-每格 `selector` 里有 `kind` 和 `value` / `name`。`on_page` 用 `states[].anchors` 与界面文字比对，**一组锚点全部出现**才算在这一页。同一控件要在多个渠道用，就在 `locator_spec` 里写多格，不要在脚本里按平台分支。
+每格 `selector` 里有 `kind` 和 `value` / `name`。`value` 必须是设备界面节点上的原文（`resource_id`、`text` 或 `content_desc`），不能用用例正文或 `label` 编一个能解析的选择器。还没有节点时，这一格先不写。`on_page` 用 `states[].anchors` 与界面文字比对，**一组锚点全部出现**才算在这一页；锚点也必须是这一屏真实出现过的文字。同一控件要在多个渠道用，就在 `locator_spec` 里写多格，不要在脚本里按平台分支。

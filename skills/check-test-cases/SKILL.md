@@ -20,6 +20,8 @@ mino-scout check .
 | `case_attr` | `case.tap` 之类，`case` 上没有这个成员 | 先 `app = case.init(case.config.<KEY>)`，设备动作写在 `app` 上 |
 | `case_init` | `case.init` 的参数不是 `case.config.<KEY>` | 改成 `case.config.<KEY>` |
 | `step_title` | `do` / `check` / `prep` 没有写文字标题 | 写这一步具体做什么的一句话 |
+| `prep_missing` | `tests/` 里的用例没有 `prep` | 写 `case.nexus.prep("做了什么")`。确实不用做，标题写为什么，这句话会写入 Nexus |
+| `prep_reason` | 前置标题只有「无」这类空话 | 写清做了什么；确实不用做，就写为什么 |
 | `config_missing` | 脚本用了 `config.yaml` 里没有的应用，或没有 `config.yaml` | 补 `config.yaml`，参见 `repo-config` |
 | `config_invalid` | `config.yaml` 格式不对 | 顶层 `apps`，每个应用要有 `platform` 和 `app_id`，key 以英文字母开头 |
 | `page_layout` | 页面文件位置不对 | 放到 `pages/<APP_KEY>/` 下，目录名等于 `config.yaml` 里的 key |
@@ -29,4 +31,5 @@ mino-scout check .
 - 语法错误不在这里检查（解析不了的文件会被跳过），语法你自己能发现；
 - 这个命令只看源码，**不检查方法名对不对**（变量名不固定）。写错 `app.xxx`，运行时会报出相近的名字，到时按提示改；
 - 没提示不代表脚本能通过：控件在页面里是否存在、锚点是否准确，只有真正执行才知道；
+- 自检不核对 `locator_spec` 是否来自真机。格式能解析不代表能点中；没有界面节点就不要写 `locator_spec`；
 - 命令不存在说明本机没装 Scout，参见 `overview`。

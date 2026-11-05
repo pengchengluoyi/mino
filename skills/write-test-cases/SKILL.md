@@ -20,8 +20,11 @@ python -c "import mino_scout, pathlib; print(pathlib.Path(mino_scout.__file__).p
 ```python
 def run(case):
     camera = case.init(case.config.camera)         # 绑定 config.yaml 里的 camera
-    with case.nexus.do("点击快拍按钮"):
+    with case.nexus.prep("清理应用缓存"):            # 前置，写在所有 do 之前
+        camera.clear_cache()
+    with case.nexus.do("2-1 启动应用"):              # 原文第 2 步拆开，序号保留
         camera.launch()
+    with case.nexus.do("2-2 点击快拍按钮"):
         camera.tap("splash.quick_snap")             # page_key.control_id，页面在 pages/camera/
     with case.nexus.check("出现取景框"):
         camera.on_page("viewfinder")
@@ -44,7 +47,10 @@ def run(case):
 
 - `title` 写**这一步具体做什么 / 验证什么**的一句话，取用例原文的意思，例如 `do("输入手机号并点击获取验证码")`、`check("提示验证码已发送")`；
 - 不要写 `do("步骤1")`、`do("操作")`，报告里会看不出哪一步坏了；
-- 用例原文有几个操作步骤就写几个 `do`，有几条预期就写几个 `check`，顺序与原文一致；原文缺步骤就停下问，不要自己补；
+- 前置、操作、预期都要落进脚本，并且**至少**覆盖原文的每一条：每条前置至少一个 `prep`，每条操作至少一个 `do`，每条预期至少一个 `check`。一条原文可以拆成相邻的几步，标题用原文序号加子号，例如第 2 条操作写成 `do("2-1 打开登录页")`、`do("2-2 输入手机号")`，预期和前置同样用 `1-1`、`2-1`。顺序跟原文一致，先写完前置再写操作；
+- 拆步是把一条原文分成几次动作，不是另编原文里没有的步骤。原文缺步骤、对不上或不可判定就停下问；
+- 前置写在同文件的 `run`（或同文件的 `pretest`）里，放在所有 `do` 之前。`precondition` 为空、并且确实不用清缓存、登录、安装或授权时，仍然写一条 `prep`，块里可以没有动作，标题写清为什么不做，例如 `prep("不依赖缓存或登录态，安装后直接开始")`。这条标题会写入 Nexus。不要写 `prep("无")`；
+- 前置里的「清理缓存 / 清除缓存 / 清除应用数据」，Android 用 `app.clear_cache()`。iOS 上这个方法会 `declined`，不要换别的命令绕过去，做不到就停下问；
 - 一个 `with` 块里只放这一步的动作；失败时 Workbench 定位到这个 title；
 - 补充证据用 `case.nexus.note("文字", 键=值)`，不要 `print`；
 - 账号一律 `case.nexus.account()` 取（Nexus 号池租用），仓库任何文件都不写账号、密码、验证码。
@@ -77,13 +83,15 @@ def run(case):
 - `app.vlm(prompt, verdict="pass")`：模型判定未通过会直接中止，`reason_code=vlm_failed`；
 - `app.sample(duration_ms, interval_ms)` 连续截图，再用 `app.vlm_frame(i, prompt)` 看第 i 帧；
 - 截图只在 Scout 本机和模型之间传递，不回 Nexus；
-- `tap_xy` / `drag` 只在控件定位不了、必须依据视觉结果点位置时才用；能用 `pages` 控件就不要用坐标。
+- `tap_xy` / `drag` 只在控件定位不了、必须依据视觉结果点位置时才用；能用 `pages` 控件就不要用坐标。`vlm` 不返回节点，也不能当成 `locator_spec`。
 
 ## 5. 规则
 
 - `case.init(...)` 的参数只能写 `case.config.<KEY>`，不写字面量包名 / 地址；
 - 多个应用就多个实例，各管各的页面和截图；同一用例里顺序执行，不并行；
 - 控件写 `page_key.control_id`，页面里没有的控件不点；
+- `locator_spec` 的值必须是这台设备当前界面节点上的 `resource_id`、`text` 或 `content_desc`，逐字复制。用例正文、按钮的中文说法、页面 `label` 都不是选择器。没有这份节点时，页面只留 `id` 和 `label`，不要写 `locator_spec`，也不要写对应的 `tap` / `input`；
+- 同一屏上这个值出现多次就不能用。优先唯一的 `resource_id`，其次唯一的 `content_desc`，最后才是唯一的 `text`。页面锚点同样只取这一屏真实出现过的文字；
 - **不要自己再造 Scout 已有的能力**：
 
 | 不要写 | 改用 |
