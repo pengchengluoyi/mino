@@ -4,9 +4,8 @@
 
 ## 0.1.6
 
-- `README` / `update-skills`：安装与更新改为让用户把仓库地址交给 agent，按各 agent 惯用的装 Skill 方式处理（技能在 `skills/`）。
-- `overview`：改成三端介绍（云端 Nexus / Workbench + 本机 Scout）；去掉「安装 Nexus / Workbench」；设备细节不再指向 Scout 源码仓文档；明确用户机只装 Scout，本地状态在 `~/.mino/`。
-- 安装与线上地址说明只写当前用法，不再夹带本地联调口或旧安装路径提醒。
+- 技能安装：把仓库地址交给 agent，按该 agent 惯用方式安装（技能在 `skills/`）。
+- `overview`：说明 Nexus / Workbench / Scout 三端分工；用户电脑只装 Scout，本地状态在 `~/.mino/`。
 
 需要已部署的 Cloudflare Nexus（`nexus.minocc.top`）与 Workbench Pages。
 
