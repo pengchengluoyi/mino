@@ -2,6 +2,12 @@
 
 每个版本写清需要的 Scout / Nexus 版本。技能说的和实际对不上时，先核对这里。
 
+## 0.1.5
+
+- `onboarding` / `overview` / `README`：默认线上地址。MCP 固定 `https://nexus.minocc.top/mcp`，Workbench `https://workbench.minocc.top`；不再引导本机 `:50101`。
+
+需要已部署的 Cloudflare Nexus（`nexus.minocc.top`）与 Workbench Pages。
+
 ## 0.1.4
 
 - 写用例先选定一台可执行设备。页面定位、点击、截图和界面结构都写在用例脚本里，由 `case_run` 交给 Scout 的 `script.run`。

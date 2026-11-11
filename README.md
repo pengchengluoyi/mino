@@ -47,7 +47,8 @@ cp ~/.mino/skills-src/VERSION ~/.mino/skills-src/CHANGELOG.md ~/.claude/skills/
 ## 前提
 
 - 本机已安装并运行 MinoScout（怎么装见 `overview`）；
-- agent 已连接 Nexus 的 MCP（`agent_guide` 是总入口）；
+- agent 已连接线上 Nexus MCP：`https://nexus.minocc.top/mcp`（`agent_guide` 是总入口；不要用本机 `:50101`）；
+- Workbench：`https://workbench.minocc.top`；
 - `write-test-cases` 里的方法以本机安装的 `mino_scout/runtime/script_exec.py` 为准。
 
 ## 目录规范

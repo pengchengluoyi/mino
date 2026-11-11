@@ -16,7 +16,7 @@ mino-scout check .
 | 类型 | 意思 | 怎么改 |
 |---|---|---|
 | `forbidden` | 绕开了 Scout（设备库、`subprocess`、线程、`exec`/`eval`、`if platform`） | 设备动作改用 `app.*`，设备命令改用 `app.exec()`，不要并发，平台差异放 `pages` 的 `locator_spec` |
-| `reuse` | 自己重复实现了 Scout 已有的能力（`time.sleep`、`imaplib`、直接调模型） | 改用 `case.scout.wait()` / `otp_mail()` / `llm()` / `app.vlm()` |
+| `reuse` | 自己重复实现了 Scout 已有的能力（`time.sleep`、`imaplib`、直接调模型） | 改用 `case.scout.wait()` / `otp(account)` / `llm()` / `app.expect()` |
 | `case_attr` | `case.tap` 之类，`case` 上没有这个成员 | 先 `app = case.init(case.config.<KEY>)`，设备动作写在 `app` 上 |
 | `case_init` | `case.init` 的参数不是 `case.config.<KEY>` | 改成 `case.config.<KEY>` |
 | `step_title` | `do` / `check` / `prep` 没有写文字标题 | 写这一步具体做什么的一句话 |

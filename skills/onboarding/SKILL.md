@@ -23,52 +23,53 @@ Scout 安装命令里的一次性安装凭证只在生成时显示一次，等�
 - 不要去读数据库、配置目录或浏览器存储来找它；过期了就在 Workbench 重新生成安装命令；
 - 用完告诉用户“已接入”，不要复述命令里的凭证。
 
-## Nexus 地址
+## 线上地址
 
-向用户确认 Nexus 的地址：
+默认用线上 Cloudflare 部署，不要改成本机端口：
 
-| 环境 | 地址 |
+| 用途 | 地址 |
 |---|---|
-| 正式部署 | `http://<服务器>:50104`（Workbench 内置在 Nexus 里，同一个地址） |
-| 本机源码开发 | `http://127.0.0.1:50101`（前端开发服务器 `http://localhost:60101`） |
+| Workbench（网页） | `https://workbench.minocc.top` |
+| Nexus（API / MCP） | `https://nexus.minocc.top` |
+| MCP | `https://nexus.minocc.top/mcp` |
 
-下面用 `<NEXUS>` 表示它。
+下面用 `<WORKBENCH>` = `https://workbench.minocc.top`，`<NEXUS>` = `https://nexus.minocc.top`。
 
 ## 一、注册并登录
 
-1. 打开 `<NEXUS>/register`，填邮箱和密码（密码至少 8 位），提交；
-2. 注册成功会跳到 `<NEXUS>/login`，用同一邮箱密码登录；
-3. 已有账号直接去 `<NEXUS>/login`。
+1. 打开 `<WORKBENCH>/register`，填邮箱和密码（密码至少 8 位），提交；
+2. 注册成功会跳到 `<WORKBENCH>/login`，用同一邮箱密码登录；
+3. 已有账号直接去 `<WORKBENCH>/login`。
 
 确认：登录后进入 Workbench 首页（项目列表）。
 
 ## 二、用 OAuth 接入你自己
 
-MCP 地址是 `<NEXUS>/mcp`。配置里只写这个地址。
+MCP 地址固定为 `https://nexus.minocc.top/mcp`。配置里只写这个地址，不要写本机 `127.0.0.1` 或 `:50101`。
 
 Claude Code：
 
 ```bash
-claude mcp add --transport http mino '<NEXUS>/mcp'
+claude mcp add --transport http mino 'https://nexus.minocc.top/mcp'
 ```
 
 其他客户端写成：
 
 ```json
-{ "mcpServers": { "mino": { "type": "http", "url": "<NEXUS>/mcp" } } }
+{ "mcpServers": { "mino": { "type": "http", "url": "https://nexus.minocc.top/mcp" } } }
 ```
 
 客户端连上后会打开浏览器。页面要求登录时，用刚才的 Workbench 账号登录，然后点允许。允许之后，这个客户端就以该账号调用 Mino。客户端自己保存并刷新凭证。
 
 重启会话（或在 agent 里刷新 MCP 连接），确认出现名字以 `agent_guide`、`project_list`、`case_list` 开头的 Mino 工具。**第一件事调 `agent_guide`**，它是总入口。
 
-确认：`project_list` 能返回项目（空列表也算通）。客户端停在需要授权：重新连接，让用户在浏览器里点允许。授权记录在 `<NEXUS>/assistant?tab=mcp`，可以吊销某一个客户端。助手功能没启用时告诉用户让管理员处理。
+确认：`project_list` 能返回项目（空列表也算通）。客户端停在需要授权：重新连接，让用户在浏览器里点允许。授权记录在 `<WORKBENCH>/assistant?tab=mcp`，可以吊销某一个客户端。助手功能没启用时告诉用户让管理员处理。
 
 ## 三、给有设备的电脑装 Scout
 
 Scout 装在**有被测设备的那台电脑**上，不一定是你所在的电脑。
 
-1. 打开 `<NEXUS>/settings/runtime`（节点与设备页），点“添加节点”；
+1. 打开 `<WORKBENCH>/settings/runtime`（节点与设备页），点“添加节点”；
 2. 选这台电脑的系统（macOS / Linux 终端，或 Windows PowerShell）；
 3. 页面生成安装命令（只显示一次，一段时间后过期，过期了点“生成新的安装命令”）；
 4. 在**那台电脑**的终端里执行：
@@ -100,11 +101,11 @@ Scout 的下载中心已经通过 MCP 开放，不用回 Workbench 点：
 
 规则：节点必须在线；`operation_id` 重试时沿用同一个，避免重复安装；返回任务还没完成就用 `plugin_status(node_id)` 按任务查状态，不要换请求 ID 重装；Nexus 不下载也不保存安装包，是节点自己下载。
 
-其余依赖（`adb` 本身、WDA、桌面授权等）见 `overview` 的“安装 Scout”一节。装完设备仍看不到：让用户去 `<NEXUS>/settings/runtime` 看节点和设备状态，不要自己改配置文件。
+其余依赖（`adb` 本身、WDA、桌面授权等）见 `overview` 的“安装 Scout”一节。装完设备仍看不到：让用户去 `<WORKBENCH>/settings/runtime` 看节点和设备状态，不要自己改配置文件。
 
 ## 四、项目、应用和脚本仓库
 
-1. 项目：在 `<NEXUS>/testing` 创建或选择一个项目（`project_list` 能看到）；
+1. 项目：在 `<WORKBENCH>/testing` 创建或选择一个项目（`project_list` 能看到）；
 2. 脚本仓库：在该项目的配置页，**“脚本仓库”卡片**里填仓库地址和分支（项目的 Git 仓库；私有仓库要在装 Scout 的电脑和你的电脑上各自配好 git 凭据，Nexus 不保存令牌）；
 3. 应用：用 `app_create` 或在 Workbench 创建，得到应用 id，再按 `repo-config` 写 `config.yaml` 并同步；
 4. 用例：在 Workbench 导入或创建用例（`case_list` 能取到）。

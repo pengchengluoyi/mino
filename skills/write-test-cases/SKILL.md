@@ -36,7 +36,7 @@ def run(case):
 | 对象 | 需要实例化 | 方法 |
 |---|---|---|
 | `app`（`case.init(...)` 的返回值） | 是，一个应用一个 | 见 §3 |
-| `case.scout` | 否 | `wait(ms)`、`otp_mail()`、`llm(prompt, text, schema)` |
+| `case.scout` | 否 | `wait(ms)`、`otp(account)`、`llm(prompt, text, schema)` |
 | `case.nexus` | 否 | `prep(title)` / `do(title)` / `check(title)`、`account()`、`note(text, **fields)`、`fail(message)` |
 
 `case` 上只有 `config`、`env`、`init`、`scout`、`nexus`。`case.tap(...)`、`case.launch()` 这类写法不存在。写错方法名，运行时会报出相近的名字和可用列表，按提示改。
@@ -53,7 +53,7 @@ def run(case):
 - 前置里的「清理缓存 / 清除缓存 / 清除应用数据」，Android 用 `app.clear_cache()`。iOS 上这个方法会 `declined`，不要换别的命令绕过去，做不到就停下问；
 - 一个 `with` 块里只放这一步的动作；失败时 Workbench 定位到这个 title；
 - 补充证据用 `case.nexus.note("文字", 键=值)`，不要 `print`；
-- 账号一律 `case.nexus.account()` 取（Nexus 号池租用），仓库任何文件都不写账号、密码、验证码。
+- 账号一律 `case.nexus.account()` 取（Nexus 号池租用），仓库任何文件都不写账号、密码、验证码。验证码用 `case.scout.otp(account)`，它按这个账号的登录策略取（账号自带码 / 固定码 / Gmail），不要自己规定渠道。
 
 ## 3. `app` 的方法与渠道支持
 
@@ -73,9 +73,19 @@ def run(case):
 | `clear_cache()` | ✓ | declined | – | – | – |
 | `read_data(key)` `set_ime(ime)` | ✓ | – | – | – | – |
 | `reload()` `open_tab(url)` `switch_tab(i)` `upload(path, c)` `wait_ready(ms, c)` | – | – | ✓ | – | – |
-| `screenshot()` `sample(ms, interval)` `hierarchy()` `on_page(page)` `vlm(...)` `vlm_frame(i, ...)` | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `screenshot()` `sample(ms, interval)` `hierarchy()` `on_page(page)` `expect(page=, prompt=)` `vlm(...)` `vlm_frame(i, ...)` | ✓ | ✓ | ✓ | ✓ | ✓ |
 
-`c` 表示控件，写 `page_key.control_id`。所有方法返回 `ActionResult`（`ok`、`summary`、`status`、`data`），`vlm` 系列返回字符串。
+`c` 表示控件，写 `page_key.control_id`。`tap` / `input` / `long_press` 可带 `index=`，取同一选择器命中的第几个（0 起，按屏幕顺序）。目前只有 Android 消费 `index`，其他渠道带它会直接 `declined`。所有方法返回 `ActionResult`（`ok`、`summary`、`status`、`data`），`vlm` 系列返回字符串。
+
+### 断言用 `expect`，不要一上来就 `vlm`
+
+`app.expect(page="登录页", prompt="当前是登录页")` 按顺序取：
+
+1. 给了 `page` 且页面锚点对得上 → 直接过，**不调模型**；
+2. 锚点对不上或没给 `page` → 把这一屏的界面文字交给文本模型判断；
+3. 文本给不出结论 → 才让视觉模型看截图。
+
+实际用了哪一种会写进 `note` 的 `checker` 字段。只有预期本身依赖画面（配色、3D 预览、加载动画）才直接写 `vlm`。
 
 ## 4. 视觉判定与坐标
 
@@ -93,12 +103,14 @@ def run(case):
 - `locator_spec` 的值必须是这台设备当前界面节点上的 `resource_id`、`text` 或 `content_desc`，逐字复制。用例正文、按钮的中文说法、页面 `label` 都不是选择器。没有这份节点时，页面只留 `id` 和 `label`，不要写 `locator_spec`，也不要写对应的 `tap` / `input`；
 - 同一屏上这个值出现多次就不能用。优先唯一的 `resource_id`，其次唯一的 `content_desc`，最后才是唯一的 `text`。不可点击的标题和可点击的按钮文案相同，只算可点击的那一个。页面锚点同样只取这一屏真实出现过的文字；
 - 用例叫法能对上某个节点的 `text` 或 `content_desc`，定位就用这份文字。对不上时，用这一步截图判断目标在画面的哪一块，只在该区域的真实节点里比较 `locator_spec`。视觉给出的位置不写入 `pages`，也不写 `bounds` 或 `tap_xy`。哪一份定位匹配度最高，用下一次 `case_run` 点一下再读界面来定，不能把视觉结果原样落成选择器；
+- 一格 `selector` 之外还能加 `selectors` 列表，写多把备选（`resource_id` / `text` / `content_desc` / `class` 混着写）。解析按 `resource_id` → `text` → `content_desc` → 包含匹配 → `class` 逐级试，谁先命中用谁。同名节点多时，先用 `resource_id` 收窄，再退回文字；
+- 内容型控件（列表卡片、无文字贴图按钮）用 `kind: class` 圈定，再在脚本里传 `index=` 取第几个，不要写死某一行的文案；
 - **不要自己再造 Scout 已有的能力**：
 
 | 不要写 | 改用 |
 |---|---|
 | `time.sleep(...)` | `case.scout.wait(ms)` |
-| `imaplib` / `poplib` 取验证码 | `case.scout.otp_mail()` |
+| `imaplib` / `poplib` 取验证码 | `case.scout.otp(account)`（按账号策略：自带码 / 固定码 / Gmail） |
 | `openai` / `anthropic` 调模型 | `case.scout.llm()` / `app.vlm()` |
 | `subprocess`、`os.system`、`exec`、`eval` | `app.exec()` |
 | `adbutils`、`playwright`、`appium` 等设备库 | `app.*` |

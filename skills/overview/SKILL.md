@@ -61,4 +61,11 @@ mino-scout probe      # 打印本机能用的渠道和设备，不连 Nexus
 
 ## 安装 Nexus / Workbench
 
-Workbench 已内置在 Nexus 里，一个服务一个端口（默认 50104），浏览器直接访问。Nexus 的安装和升级见 MinoNexus 仓库 `docs/github-updates.md`，这通常由管理员完成，不属于写用例的范围。
+线上默认：
+
+| 用途 | 地址 |
+|---|---|
+| Workbench | `https://workbench.minocc.top` |
+| Nexus API / MCP | `https://nexus.minocc.top`（MCP：`https://nexus.minocc.top/mcp`） |
+
+本机源码联调才用 `http://127.0.0.1:50101`，写用例/上手默认走线上。Nexus 的安装和升级由管理员完成，不属于写用例的范围。
