@@ -25,8 +25,6 @@ Scout 安装命令里的一次性安装凭证只在生成时显示一次，等�
 
 ## 线上地址
 
-默认用线上 Cloudflare 部署，不要改成本机端口：
-
 | 用途 | 地址 |
 |---|---|
 | Workbench（网页） | `https://workbench.minocc.top` |
@@ -45,7 +43,7 @@ Scout 安装命令里的一次性安装凭证只在生成时显示一次，等�
 
 ## 二、用 OAuth 接入你自己
 
-MCP 地址固定为 `https://nexus.minocc.top/mcp`。配置里只写这个地址，不要写本机 `127.0.0.1` 或 `:50101`。
+MCP 地址：`https://nexus.minocc.top/mcp`。
 
 Claude Code：
 

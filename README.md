@@ -4,7 +4,7 @@
 
 | 技能 | 一句话 |
 |---|---|
-| `overview` | Mino 是什么，Scout / Nexus / Workbench 各管什么，Scout 怎么装 |
+| `overview` | Mino 是什么，Scout / Nexus / Workbench 三端各管什么，Scout 怎么装 |
 | `onboarding` | 第一次使用：注册登录、用 OAuth 接入 MCP、装 Scout 节点、准备项目与脚本仓库 |
 | `repo-config` | 脚本仓库怎么组织，`config.yaml` 怎么配应用和环境，改了怎么同步给 Nexus |
 | `write-test-cases` | 为用例写脚本（Scout 侧）：`app` / `case.scout` / `case.nexus` 怎么用 |
@@ -16,38 +16,21 @@
 
 ## 安装给 agent
 
-agent 读取的是 `~/.claude/skills/` 里的技能目录，每个目录里有自己的 `SKILL.md`。
+把下面这段发给你正在用的 agent，让它按自己惯用的方式安装。技能在仓库的 `skills/` 下。
 
-> 请安装 Mino 的技能：
-> 1. 把 `https://github.com/pengchengluoyi/mino.git` clone 到 `~/.mino/skills-src`（已存在就 `git pull --ff-only`）；
-> 2. 把 `skills/` 下的每个技能目录复制到 `~/.claude/skills/`（已有同名目录时先告诉我，不要覆盖）。同时复制 `VERSION` 和 `CHANGELOG.md` 到 `~/.claude/skills/`；
-> 3. 确认 `~/.claude/skills/<技能名>/SKILL.md` 存在，告诉我装到了哪里，并提醒我新开一个会话让技能生效；
-> 4. 然后按技能 `onboarding` 带我完成注册、OAuth 接入 MCP 和 Scout 节点。
+> 帮我安装这个 Skill：https://github.com/pengchengluoyi/mino.git
+> 装好后按技能 `onboarding` 带我完成注册、OAuth 接入 MCP 和 Scout 节点。
 
-```bash
-git clone https://github.com/pengchengluoyi/mino.git ~/.mino/skills-src
-mkdir -p ~/.claude/skills
-cp -R ~/.mino/skills-src/skills/. ~/.claude/skills/
-cp ~/.mino/skills-src/VERSION ~/.mino/skills-src/CHANGELOG.md ~/.claude/skills/
-```
-
-其他 agent 工具把 `~/.claude/skills` 换成它读取技能的目录。
+装完后**新开一个会话**再让技能生效。版本与变更见仓库根目录的 `VERSION`、`CHANGELOG.md`。
 
 ## 更新
 
-```bash
-git -C ~/.mino/skills-src pull --ff-only
-rm -rf ~/.claude/skills/check-test-cases ~/.claude/skills/onboarding ~/.claude/skills/overview ~/.claude/skills/repo-config ~/.claude/skills/run-test-cases ~/.claude/skills/update-skills ~/.claude/skills/write-test-cases
-cp -R ~/.mino/skills-src/skills/. ~/.claude/skills/
-cp ~/.mino/skills-src/VERSION ~/.mino/skills-src/CHANGELOG.md ~/.claude/skills/
-```
-
-复制完成后新开会话生效。每个版本需要的 Scout / Nexus 版本见 `~/.claude/skills/CHANGELOG.md`。技能有误或缺内容时，见技能 `update-skills`。
+同样让 agent 从同一地址按它自己的方式更新，见技能 `update-skills`。
 
 ## 前提
 
 - 本机已安装并运行 MinoScout（怎么装见 `overview`）；
-- agent 已连接线上 Nexus MCP：`https://nexus.minocc.top/mcp`（`agent_guide` 是总入口；不要用本机 `:50101`）；
+- agent 已连接 Nexus MCP：`https://nexus.minocc.top/mcp`（`agent_guide` 是总入口）；
 - Workbench：`https://workbench.minocc.top`；
 - `write-test-cases` 里的方法以本机安装的 `mino_scout/runtime/script_exec.py` 为准。
 

@@ -2,9 +2,17 @@
 
 每个版本写清需要的 Scout / Nexus 版本。技能说的和实际对不上时，先核对这里。
 
+## 0.1.6
+
+- `README` / `update-skills`：安装与更新改为让用户把仓库地址交给 agent，按各 agent 惯用的装 Skill 方式处理（技能在 `skills/`）。
+- `overview`：改成三端介绍（云端 Nexus / Workbench + 本机 Scout）；去掉「安装 Nexus / Workbench」；设备细节不再指向 Scout 源码仓文档；明确用户机只装 Scout，本地状态在 `~/.mino/`。
+- 安装与线上地址说明只写当前用法，不再夹带本地联调口或旧安装路径提醒。
+
+需要已部署的 Cloudflare Nexus（`nexus.minocc.top`）与 Workbench Pages。
+
 ## 0.1.5
 
-- `onboarding` / `overview` / `README`：默认线上地址。MCP 固定 `https://nexus.minocc.top/mcp`，Workbench `https://workbench.minocc.top`；不再引导本机 `:50101`。
+- `onboarding` / `overview` / `README`：默认使用线上 MCP 与 Workbench 地址。
 
 需要已部署的 Cloudflare Nexus（`nexus.minocc.top`）与 Workbench Pages。
 
@@ -20,7 +28,6 @@
 - `run-test-cases` 只写通过 `case_run` 跑脚本仓。
 - `overview` 里 Nexus 的职责与现在的派发方式一致：下发仓库、提交和设备，脚本在 Scout 执行。
 - `onboarding`、`overview`、`README`：MCP 接入是浏览器里的 OAuth。配置只写 `<NEXUS>/mcp`。
-- 对话读取 `~/.claude/skills/` 里的技能目录。更新时从仓库复制进去。
 
 需要 Scout 0.1.134、Nexus 0.1.76。
 
