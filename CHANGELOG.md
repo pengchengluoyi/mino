@@ -2,6 +2,13 @@
 
 每个版本写清需要的 Scout / Nexus 版本。技能说的和实际对不上时，先核对这里。
 
+## 0.1.8
+
+- `repo-config`：新增 §0「新增应用：先问齐再写」——加安卓 / iOS / Web 前必须问清项目环境与各环境 package / bundle_id / url；完成态是写 `config.yaml` + push + `repo_apps_sync`，**仅 `app_create` 不算完成**。
+- `onboarding` 第四节补「先确认环境再加应用」；`overview` 路由表增加「加应用 / 配包名」指向 `repo-config`。
+
+需要 Scout / Nexus 版本同 0.1.7（Scout 0.1.141、Nexus 0.1.80）。
+
 ## 0.1.7
 
 - 脚本仓优先：`config.yaml` 只认应用 key，**不再要求 `app_id` / `project_id`**；`repo_apps_sync` 可不传 `app_id`，Nexus 按 key 对齐或自动创建应用。

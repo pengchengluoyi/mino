@@ -31,6 +31,7 @@ Mino 是一套自动化测试系统：由 AI 写测试脚本，在真实设备�
 |---|---|
 | 搞清楚怎么分工、怎么装 Scout | 本技能 |
 | 第一次使用：注册、用 OAuth 接入 MCP、给电脑装 Scout 节点、准备项目和仓库 | `onboarding` |
+| 给项目加安卓 / iOS / Web 应用，或配包名、bundle id、环境 | `repo-config`（先按其中 §0 问齐再写仓；不要只调 `app_create`） |
 | 了解脚本仓库怎么组织、`config.yaml` 怎么配应用和环境 | `repo-config` |
 | 为用例写脚本 | `write-test-cases` |
 | 写完检查脚本 | `check-test-cases` |

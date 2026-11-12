@@ -105,10 +105,11 @@ Scout 的下载中心已经通过 MCP 开放，不用回 Workbench 点：
 
 1. 项目：在 `<WORKBENCH>/testing` 创建或选择一个项目（`project_list` 能看到）；
 2. 脚本仓库：在该项目的配置页，**“脚本仓库”卡片**里填仓库地址和分支（项目的 Git 仓库；私有仓库要在装 Scout 的电脑和你的电脑上各自配好 git 凭据，Nexus 不保存令牌）；
-3. 应用：按 `repo-config` 先在脚本仓 `config.yaml` 写应用 key（不要写 `app_id`），push 后调 `repo_apps_sync`；Nexus 按 key 对齐或自动创建应用。不必先 `app_create`（仍可用，但不作为写仓前置）；
-4. 用例：在 Workbench 导入或创建用例（`case_list` 能取到）。
+3. 环境：在 Workbench 项目里确认有哪些环境（如 `test`、`prod`）。加应用前**先问用户**环境清单；后面 `config.yaml` 的环境名必须与之一致；
+4. 应用：用户要加安卓 / iOS / Web 等应用时，**整段按 `repo-config` §0**：先问平台、各环境的包名 / bundle id / URL，再写 `config.yaml`（不要写 `app_id`），push 后 `repo_apps_sync`。Nexus 按 key 对齐或自动创建。**不要**只调 `app_create` 就说做完——那个只建空壳，没有身份字段不能跑；
+5. 用例：在 Workbench 导入或创建用例（`case_list` 能取到）。
 
-确认：`project_list` 返回的项目带 `repo_url`、`repo_branch`；`repo_apps_get` 能看到已同步的应用。
+确认：`project_list` 返回的项目带 `repo_url`、`repo_branch`；`repo_apps_get` 能看到已同步的应用，且带上包名 / URL 等身份字段（不只是名字）。
 
 MCP 只通信，不写脚本；脚本由 agent 在本机工作区编写并通过 Git 推送。
 

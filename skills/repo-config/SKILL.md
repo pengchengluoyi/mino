@@ -1,6 +1,6 @@
 ---
 name: repo-config
-description: 脚本仓库怎么组织、config.yaml 怎么配置被测应用和不同环境的地址与可选固定验证码、页面文件 pages 怎么写。新建或修改脚本仓库的目录、应用、环境、页面时使用；写具体用例见 write-test-cases。
+description: 脚本仓库怎么组织、config.yaml 怎么配置被测应用和不同环境的地址与可选固定验证码、页面文件 pages 怎么写。用户说给项目加安卓/iOS/Web 应用、配包名或环境、新建或修改脚本仓目录与页面时使用；写具体用例见 write-test-cases。
 ---
 
 # 脚本仓库配置
@@ -8,6 +8,29 @@ description: 脚本仓库怎么组织、config.yaml 怎么配置被测应用和�
 脚本仓库是项目的 Git 仓库（地址和分支在 Nexus 的 `project_list` 里）。执行时 **Scout 自己用本机 git 拉取这个仓库**（私有仓库用 Scout 所在电脑的 git 凭据），Nexus 只告诉它仓库地址、分支、提交和设备，不经手仓库内容。
 
 **边界：** 脚本文本只由 agent 在本机写并通过 Git 推送；MCP 只通信（查项目、同步应用清单、触发跑数），不写代码、不改仓库文件。脚本仓认应用 **key**；`project_id` / `app_id` 是 Nexus 控制面身份，**不要写进 `config.yaml`**。
+
+## 0. 新增应用：先问齐再写（必做）
+
+用户说「加应用 / 加安卓 / 加 iOS / 配包名」时，**不要**只调 `app_create` 就结束。`app_create` 只建 Nexus 空壳（名字 + 平台），**没有包名、没有环境、没有脚本仓配置 = 不可跑**。完成态是：`config.yaml` 写好身份字段 → push → `repo_apps_sync` → `repo_apps_get` 能看到。
+
+缺信息就**一次问清**（或分条问完再动手），**不要猜、不要用示例包名顶替**：
+
+| 要问清的 | 说明 |
+|---|---|
+| 哪个项目 | `project_list` 对一下；没有脚本仓（`repo_url` 空）先让用户在 Workbench 配好仓库，或确认本地仓再绑 |
+| 哪些平台 | 每个平台在 `config.yaml` 里是**一条应用**（一个 key、一个 `platform`）。「安卓 + iOS」= 两条，例如 `zhw_android` / `zhw_ios`，不要指望一条里写两个 platform |
+| 项目有哪些环境 | 先问用户（如 `test`、`prod`）；名字必须与 Nexus / Workbench 项目里的环境名一致。不知道有哪些就问，不要默认只写一个 |
+| 各环境身份字段 | Android：`package`；iOS：`bundle_id`；Web：`url`。多环境身份不同 → 用 `envs`；各环境相同 → 可写在应用顶层 |
+| 可选 `otp.code` | 测试环境有固定验证码再写；没有就不写 |
+
+收集齐之后再：
+
+1. 在脚本仓 `config.yaml` 的 `apps` 下按平台各加一项（key 合法、**不写** `app_id` / `project_id`）；
+2. 建 `pages/<KEY>/`（可先空目录或占位，后续写页面再补）；
+3. push，再按 §3 `repo_apps_sync`（只传 platform / package / bundle_id / url / envs，**不要传 otp**）；
+4. `repo_apps_get` 确认；此时才可向用户说「应用已加好」。
+
+`app_create` 可选：用户已有同名空壳、或只要先在 Workbench 露面时可用；**不能替代**上面的问询与 `config.yaml` + sync。若刚才已经误用 `app_create` 建了空壳，补齐包名/环境并 sync 时仍按 key 对齐，不必删掉重来（除非用户要求重来）。
 
 ## 1. 目录构成
 
@@ -70,12 +93,12 @@ apps:
 
 规则：
 
-- 值从用户给的信息、用例前置条件或已有 `config.yaml` 里取；**拿不到包名 / URL / 环境就问用户，不要猜**；
+- 值从用户给的信息、用例前置条件或已有 `config.yaml` 里取；**拿不到包名 / URL / 环境就问用户，不要猜**（问法见 §0）；
 - 已有应用的 key 不要改，改了会让 `pages/` 目录和已有用例对不上；
 - 不放账号、密码、token（账号由 Nexus 号池租用）；测试用固定验证码仅可写在 `otp.code`；
-- 新增应用 = `config.yaml` 加一项 + 建 `pages/<KEY>/` + push 后 `repo_apps_sync`（Nexus 自动建/对齐 app）；
-- 应用的 `platform` 必须等于本次运行的设备平台；
-- 本次运行的环境由 Nexus 决定，脚本里是 `case.env`，一般不需要判断；
+- 新增应用 = 先按 §0 问齐 → `config.yaml` 加项 + 建 `pages/<KEY>/` + push 后 `repo_apps_sync`（Nexus 自动建/对齐 app）；**仅 `app_create` 不算完成**；
+- 应用的 `platform` 必须等于本次运行的设备平台；一条应用只对应一个 platform；
+- 本次运行的环境由 Nexus 决定，脚本里是 `case.env`，一般不需要判断；`config.yaml` 里声明的环境名必须能对上项目里已有环境；
 - 这是应用地址与固定码的唯一真源，由 Scout 读取；Workbench 里的包名 / URL 只读展示，要改就改这个文件并 push，再按下面的约定同步给 Nexus。
 
 ## 3. 改了 config.yaml 必须同步给 Nexus

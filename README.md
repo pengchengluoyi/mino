@@ -6,7 +6,7 @@
 |---|---|
 | `overview` | Mino 是什么，Scout / Nexus / Workbench 三端各管什么，Scout 怎么装 |
 | `onboarding` | 第一次使用：注册登录、用 OAuth 接入 MCP、装 Scout 节点、准备项目与脚本仓库 |
-| `repo-config` | 脚本仓库怎么组织，`config.yaml` 怎么配应用 / 环境 / 可选 `otp.code`，改了怎么同步给 Nexus（按 key，不写 `app_id`） |
+| `repo-config` | 加应用先问环境与包名；`config.yaml` 怎么配应用 / 环境 / 可选 `otp.code`，改了怎么同步给 Nexus（按 key，不写 `app_id`；仅 `app_create` 不算完成） |
 | `write-test-cases` | 为用例写脚本（Scout 侧）：`app` / `case.scout` / `case.nexus` 怎么用 |
 | `check-test-cases` | 写完用 `mino-scout check` 自检，按提示改 |
 | `run-test-cases` | 通过 Nexus 执行用例、选设备、看结果、在对话里汇报 |
