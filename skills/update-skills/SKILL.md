@@ -17,11 +17,25 @@ mino-scout --version      # 如果没有此参数，就读 mino_scout/VERSION �
 
 ## 更新
 
-1. 用你所在 agent 的方式，从 `https://github.com/pengchengluoyi/mino.git` **重新安装或更新** `skills/` 下的全部 Mino 技能；
-2. 目标位置已有同名技能时，先告诉用户再覆盖或按该 agent 的更新约定处理；
-3. 更新后告诉用户 `CHANGELOG.md` 里这次变了什么，并说明**需要新开一个会话**，新内容才会被加载。
+技能目录必须是 `https://github.com/pengchengluoyi/mino.git` 的检出，或指向该检出 `skills/<名字>` 的符号链接。**不要把技能文件复制到 agent 的技能目录。**
 
-用户只是要更新 Mino 技能时，只动技能安装结果，不要改用户的业务仓库。
+已有检出时：
+
+```bash
+git -C <mino检出> pull --ff-only
+```
+
+还没有检出时：
+
+```bash
+git clone https://github.com/pengchengluoyi/mino.git <目录>
+```
+
+然后把 agent 要加载的每个技能指到 `<目录>/skills/<技能名>`。之后只 `git pull`。
+
+更新后告诉用户 `CHANGELOG.md` 里这次变了什么，并说明**需要新开一个会话**，新内容才会被加载。
+
+用户只是要更新 Mino 技能时，只拉取这个仓库，不要改用户的业务仓库，也不要复制技能文件。
 
 ## 发现技能有问题怎么办
 

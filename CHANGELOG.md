@@ -2,6 +2,14 @@
 
 每个版本写清需要的 Scout / Nexus 版本。技能说的和实际对不上时，先核对这里。
 
+## 0.1.9
+
+- `run-test-cases`：开跑前先 `plugin_status`，缺的渠道程序按需装完再 `case_run`。执行用 `script_targets`（需求 ID + 用例 ID），不从用例库取正文。
+- `onboarding`：脚本仓库用 `project_script_repo_set`；需求用 `requirement_save`，`case_list` 返回需求链接。
+- `update-skills`：更新改为在 mino 检出里 `git pull`，不把技能文件复制到本地技能目录。
+
+需要已部署的 Cloudflare Nexus（含 `script_targets`、`requirement_list`、`project_script_repo_set`、`repo_apps_sync`）和 Scout 0.1.143（`script.list`）。
+
 ## 0.1.8
 
 - `repo-config`：新增 §0「新增应用：先问齐再写」——加安卓 / iOS / Web 前必须问清项目环境与各环境 package / bundle_id / url；完成态是写 `config.yaml` + push + `repo_apps_sync`，**仅 `app_create` 不算完成**。

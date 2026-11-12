@@ -11,7 +11,7 @@ Nexus 管用例、设备、账号、任务、会话；Scout 在用户电脑上�
 
 ## 1. 执行
 
-0. 确认应用：`repo_apps_get(project_id)` 看这个项目的仓库能跑哪些应用和环境；要跑的应用不在里面，或同步的 `revision` 落后于你刚 push 的提交，先回到 `repo-config` §3 同步，再继续；
+0. 确认应用：`repo_apps_get(project_id)` 看这个项目的仓库能跑哪些应用和环境；要跑的应用不在里面，或同步的 `revision` 落后于你刚 push 的提交，先回到 `repo-config` §3 同步，再继续。项目还没有脚本仓库地址时，用 `project_script_repo_set(project_id, url, branch)` 保存地址（Nexus 只记地址，不拉仓库）；
 1. 选设备：调 `device_list`（带 `app_id`、`env_profile`，用例指定了渠道就带 `env_surface`），拿到**当前账号名下**的设备实时列表，不要复用旧结果。看这几个字段：
 
    | 字段 | 含义 |
@@ -23,9 +23,27 @@ Nexus 管用例、设备、账号、任务、会话；Scout 在用户电脑上�
    | `platform` / `model` / `node_name` | 用来和用例要求的平台匹配、向用户说明 |
 
    规则：只选 `executable=true` 且平台和用例一致的设备；有多台就列给用户或按用户指定的选；web 设备不会被独占：一台 Scout 同时可以开最多 4 个浏览器会话（4 个并行槽位），所以 `busy_task_id` 始终为空，要看 `web_parallel_full`（4 个都占满才不能再派）；全部 `busy` 就告诉用户谁占着（`busy_task_id`），**不要抢占、不要硬跑**；设备被隔离（`isolation`）时先按 §2 的隔离流程处理。设备是否空闲只由 Nexus 给出，Scout 不会替你判断。
-2. `case_run(app_id, sn, case_ids, revision=<sha>)` → 立即返回 `task_id`（异步）。脚本在项目脚本仓里，由 Scout 拉取该提交后执行。`revision` 是已 push 的 commit，可省略（省略时 Scout 取分支最新）；Nexus 不经手脚本仓库，由设备所在的 Scout 用它本机的 git 凭据自己拉取；
-3. 轮询 `task_get(task_id)`，两次查询间隔 ≥5s；用工具调用本身的等待，不要阻塞式 `sleep`；
-4. 终态即停止；过程证据读 `session_events(session_id)`。
+2. **先装齐这次要用的渠道程序，再开跑。** 用 `scout_list` 找到持有这台设备的 `node_id`，调 `plugin_status(node_id)`。只补这次平台缺的组件，已经装好的不要重装：
+
+   | 这次要跑 | 缺了才装 | 调用 |
+   |---|---|---|
+   | Web | Chromium | `node_channel_program(node_id, tool_id=chromium, action=install)` |
+   | iOS | Appium | `node_channel_program(node_id, tool_id=appium, action=install)` |
+   | Android 需要键盘输入 | ADB Keyboard | `node_channel_program(node_id, tool_id=adb.keyboard, action=install)` |
+
+   `operation_id` 自己定一个并记住。返回后隔几秒再 `plugin_status(node_id)`，直到这次安装不再进行中。没装完不要 `case_run`。重试必须沿用同一个 `operation_id`。看到 `declined / 缺 appium`（或其它渠道程序）说明顺序反了：先装完，再跑，不要先跑再补装。
+3. `case_run` 传 `script_targets`，不要拿用例库里的正文。`case_list` / `requirement_list` 只返回需求 id、名称和渠道链接。从链接读出用例后，脚本在 `tests/<需求ID>/<用例ID>.py`。
+
+   ```text
+   case_run(
+     app_id, sn, revision=<已 push 的 sha>,
+     script_targets=[{requirement_id, case_ids}]
+   )
+   ```
+
+   `case_ids` 是这次要跑的用例 ID。留空表示执行该需求目录下的全部脚本。需求还没登记时先 `requirement_save(project_id, requirement_id, title, source_url)`。顶层 `case_ids` 只在你已经知道脚本文件名、且不按需求目录跑时使用。`revision` 可省略（Scout 取分支最新）。Nexus 不经手脚本仓库，由设备所在的 Scout 用本机 git 凭据拉取。
+4. 轮询 `task_get(task_id)`，两次查询间隔 ≥5s；用工具调用本身的等待，不要阻塞式 `sleep`；
+5. 终态即停止；过程证据读 `session_events(session_id)`。
 
 | `task_get.status` | 动作 |
 |---|---|

@@ -97,17 +97,17 @@ Scout 的下载中心已经通过 MCP 开放，不用回 Workbench 点：
 | iOS | `node_channel_program` | `tool_id=appium` |
 | 飞书 / Meego 工作项、对话渠道 | `plugin_install` | `plugin=cli.feishu` / `cli.meego` / `langbot` |
 
-规则：节点必须在线；`operation_id` 重试时沿用同一个，避免重复安装；返回任务还没完成就用 `plugin_status(node_id)` 按任务查状态，不要换请求 ID 重装；Nexus 不下载也不保存安装包，是节点自己下载。
+规则：节点必须在线；`operation_id` 重试时沿用同一个，避免重复安装；返回任务还没完成就用 `plugin_status(node_id)` 按任务查状态，不要换请求 ID 重装；Nexus 不下载也不保存安装包，是节点自己下载。每次 `case_run` 之前再查一次：缺了这次要跑的渠道就先装完，再跑。顺序见 `run-test-cases`。
 
 其余依赖（`adb` 本身、WDA、桌面授权等）见 `overview` 的“安装 Scout”一节。装完设备仍看不到：让用户去 `<WORKBENCH>/settings/runtime` 看节点和设备状态，不要自己改配置文件。
 
 ## 四、项目、应用和脚本仓库
 
 1. 项目：在 `<WORKBENCH>/testing` 创建或选择一个项目（`project_list` 能看到）；
-2. 脚本仓库：在该项目的配置页，**“脚本仓库”卡片**里填仓库地址和分支（项目的 Git 仓库；私有仓库要在装 Scout 的电脑和你的电脑上各自配好 git 凭据，Nexus 不保存令牌）；
+2. 脚本仓库：`project_script_repo_set(project_id, url, branch)`，或在该项目配置页的「脚本仓库」卡片里填地址和分支。私有仓库要在装 Scout 的电脑和你的电脑上各自配好 git 凭据，Nexus 不保存令牌；
 3. 环境：在 Workbench 项目里确认有哪些环境（如 `test`、`prod`）。加应用前**先问用户**环境清单；后面 `config.yaml` 的环境名必须与之一致；
 4. 应用：用户要加安卓 / iOS / Web 等应用时，**整段按 `repo-config` §0**：先问平台、各环境的包名 / bundle id / URL，再写 `config.yaml`（不要写 `app_id`），push 后 `repo_apps_sync`。Nexus 按 key 对齐或自动创建。**不要**只调 `app_create` 就说做完——那个只建空壳，没有身份字段不能跑；
-5. 用例：在 Workbench 导入或创建用例（`case_list` 能取到）。
+5. 需求：`requirement_save` 登记需求 ID、名称和渠道链接（飞书文档等）。`case_list` 返回的是这些需求，不是用例正文。用例从链接里读，脚本写成 `tests/<需求ID>/<用例ID>.py`。
 
 确认：`project_list` 返回的项目带 `repo_url`、`repo_branch`；`repo_apps_get` 能看到已同步的应用，且带上包名 / URL 等身份字段（不只是名字）。
 
