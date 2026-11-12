@@ -2,6 +2,15 @@
 
 每个版本写清需要的 Scout / Nexus 版本。技能说的和实际对不上时，先核对这里。
 
+## 0.1.10
+
+- **约束 agent**：`overview` 硬约束（先告知再动手、禁止擅自建远程仓、不把 `app_create` 当完成）。
+- **MCP vs CLI**：本机 `mino-scout`（status / probe / check），云端 MCP。
+- **`onboarding` 门禁**：注册 → MCP → **`scout_install_token` 申请安装命令 → 确认弹窗 → 本机安装**（禁止 Workbench 抄命令 / 用户粘贴）→ `project_create` / 绑仓 / sync（直接调 MCP，不写「没工具就去网页」绕路）→ 需求与用例关系说明；示例 key 用 `baidu_*`。
+- **`repo-config` / `write-test-cases` / `run-test-cases` / `check-test-cases`**：对齐绑仓、CLI 探活、需求列表不含用例正文。
+
+需要线上 MCP 含：`project_create`、`scout_install_token`（`POST /runtime/nodes/install-token`）、`project_script_repo_set`、`repo_apps_sync` / `get`、`app_delete` 等（与 Cloudflare README / HTTP 对齐）。
+
 ## 0.1.9
 
 - `run-test-cases`：开跑前先 `plugin_status`，缺的渠道程序按需装完再 `case_run`。执行用 `script_targets`（需求 ID + 用例 ID），不从用例库取正文。

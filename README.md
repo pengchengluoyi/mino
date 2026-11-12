@@ -1,40 +1,40 @@
 # mino
 
-给 AI agent 用的 Mino 技能（Agent Skills 标准：每个技能一个目录，入口是 `SKILL.md`）。
+给 AI agent 用的 Mino 技能（Agent Skills：每个技能一个目录，入口 `SKILL.md`）。
 
 | 技能 | 一句话 |
 |---|---|
-| `overview` | Mino 是什么，Scout / Nexus / Workbench 三端各管什么，Scout 怎么装 |
-| `onboarding` | 第一次使用：注册登录、用 OAuth 接入 MCP、装 Scout 节点、准备项目与脚本仓库 |
-| `repo-config` | 加应用先问环境与包名；`config.yaml` 怎么配应用 / 环境 / 可选 `otp.code`，改了怎么同步给 Nexus（按 key，不写 `app_id`；仅 `app_create` 不算完成） |
-| `write-test-cases` | 为用例写脚本（Scout 侧）：`app` / `case.scout` / `case.nexus` 怎么用 |
-| `check-test-cases` | 写完用 `mino-scout check` 自检，按提示改 |
-| `run-test-cases` | 通过 Nexus 执行用例、选设备、看结果、在对话里汇报 |
-| `update-skills` | 更新技能；技能和实际对不上时怎么反馈 |
+| `overview` | 分工、**MCP vs mino-scout CLI**、agent 硬约束 |
+| `onboarding` | 注册、接 MCP、`scout_install_token` 确认后装 Scout、`project_create`→绑仓→应用 |
+| `repo-config` | 在已绑定仓写 `config.yaml` / pages；`check` + `repo_apps_sync`；禁止擅自建远程仓 |
+| `write-test-cases` | 写用例脚本（`app` / `case.scout` / `case.nexus`） |
+| `check-test-cases` | `mino-scout check` 自检 |
+| `run-test-cases` | CLI 验本机 → MCP 触发跑数 → 对话汇报 |
+| `update-skills` | 更新技能与反馈 |
 
-每个技能只做一件事。推荐顺序：`overview` → `onboarding` → `repo-config` → `write-test-cases` → `check-test-cases` → `run-test-cases`。
+推荐顺序：`overview` → `onboarding` → `repo-config` → `write-test-cases` → `check-test-cases` → `run-test-cases`。
 
 ## 安装给 agent
 
-把下面这段发给你正在用的 agent，让它按自己惯用的方式安装。技能在仓库的 `skills/` 下。
+把下面发给你正在用的 agent，按它惯用方式安装。技能在仓库 `skills/`。
 
-> 帮我安装这个 Skill：https://github.com/pengchengluoyi/mino.git
-> 装好后按技能 `onboarding` 带我完成注册、OAuth 接入 MCP 和 Scout 节点。
+> 帮我安装这个 Skill：https://github.com/pengchengluoyi/mino.git  
+> 装好后按技能 `onboarding` 带我完成注册、OAuth 接 MCP、安装 Scout，再配置项目与脚本仓。
 
-装完后**新开一个会话**再让技能生效。版本与变更见仓库根目录的 `VERSION`、`CHANGELOG.md`。
+装完后**新开一个会话**再生效。版本见根目录 `VERSION`、`CHANGELOG.md`。
 
 ## 更新
 
-同样让 agent 从同一地址按它自己的方式更新，见技能 `update-skills`。
+见 `update-skills`：在 mino 检出里 `git pull`，不要复制技能文件到 agent 目录。
 
 ## 前提
 
-- 本机已安装并运行 MinoScout（怎么装见 `overview`）；
-- agent 已连接 Nexus MCP：`https://nexus.minocc.top/mcp`（`agent_guide` 是总入口）；
-- Workbench：`https://workbench.minocc.top`；
-- `write-test-cases` 里的方法以本机安装的 `mino_scout/runtime/script_exec.py` 为准。
+- 本机将安装并运行 MinoScout（流程在 `onboarding`，用 `mino-scout` CLI 验收）；
+- agent 已接 Nexus MCP：`https://nexus.minocc.top/mcp`（先调 `agent_guide`）；
+- Workbench：`https://workbench.minocc.top`（注册、OAuth、生成 Scout 安装命令）；
+- `write-test-cases` 方法以本机 `mino_scout/runtime/script_exec.py` 为准。
 
 ## 目录规范
 
-- 目录名等于 `SKILL.md` 里的 `name`，小写字母、数字、连字符；
-- `SKILL.md` 文件名全大写；
+- 目录名等于 `SKILL.md` 的 `name`；
+- `SKILL.md` 文件名全大写。

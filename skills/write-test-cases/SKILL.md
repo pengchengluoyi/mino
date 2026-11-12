@@ -123,7 +123,7 @@ def run(case):
 
 页面参数、点击、截图、界面结构都只来自 Scout 执行这条用例脚本。`app.hierarchy()`、`app.screenshot()`、`app.tap()`、`app.input()` 就是 Scout 的能力。写的时候调用 `case_run`，由 Scout 跑 `script.run`。不要用浏览器、adb、Playwright 或其他工具去看界面、点控件、抄 DOM。
 
-1. 取用例：`case_list(project_id, search=<case_id>)`，拿到 `case_id`、`requirement_id`、`platform`、`steps`、`expected`、`precondition`。**步骤不连续、平台不明确、预期不可判定就停下问，不猜。**
+1. 取**需求**：`case_list` / `requirement_list(project_id)` 拿到需求的 `requirement_id`、标题、`source_url`（这是范围与原文入口，**不是**用例步骤正文）。打开链接（或用户给的原文）整理出要写成脚本的各条用例；步骤不清就停下问，不猜。关系见 `onboarding` §4.4。
 2. 取仓库：`project_list` 拿 `repo_url`、`repo_branch`。
    - 本机路径约定 `~/.mino/workspaces/<project_id>`；
    - 不存在：`git clone --branch <repo_branch> <repo_url>`；

@@ -32,4 +32,4 @@ mino-scout check .
 - 这个命令只看源码，**不检查方法名对不对**（变量名不固定）。写错 `app.xxx`，运行时会报出相近的名字，到时按提示改；
 - 没提示不代表脚本能通过：控件在页面里是否存在、锚点是否准确，只有真正执行才知道；
 - 自检不核对 `locator_spec` 是否来自真机。格式能解析不代表能点中。`locator_spec` 只从 `case_run` 之后 `capability_id=hierarchy` 的 `nodes` 或 `hierarchy_text` 里抄；没有这次运行的界面结构就不要写。
-- 命令不存在说明本机没装 Scout，参见 `overview`。
+- 命令不存在说明本机没装 Scout：按 `onboarding` 门禁 3 协助安装，不要只丢文档链接。
