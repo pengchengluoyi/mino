@@ -2,6 +2,10 @@
 
 每个版本写清需要的 Scout / Nexus 版本。技能说的和实际对不上时，先核对这里。
 
+## 0.1.11
+
+- **`update-skills` / README**：Cursor 安装改为从 GitHub **复制**到 `~/.cursor/skills/`；**明确禁止**软链到本机开发仓。
+
 ## 0.1.10
 
 - **约束 agent**：`overview` 硬约束（先告知再动手、禁止擅自建远程仓、不把 `app_create` 当完成）。

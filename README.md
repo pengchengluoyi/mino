@@ -4,37 +4,38 @@
 
 | 技能 | 一句话 |
 |---|---|
-| `overview` | 分工、**MCP vs mino-scout CLI**、agent 硬约束 |
-| `onboarding` | 注册、接 MCP、`scout_install_token` 确认后装 Scout、`project_create`→绑仓→应用 |
-| `repo-config` | 在已绑定仓写 `config.yaml` / pages；`check` + `repo_apps_sync`；禁止擅自建远程仓 |
-| `write-test-cases` | 写用例脚本（`app` / `case.scout` / `case.nexus`） |
+| `overview` | 分工、MCP vs mino-scout CLI、agent 硬约束 |
+| `onboarding` | 注册、接 MCP、`scout_install_token` 确认后装 Scout、建项目绑仓 |
+| `repo-config` | 已绑定仓写 `config.yaml` / pages；`check` + `repo_apps_sync` |
+| `write-test-cases` | 写用例脚本 |
 | `check-test-cases` | `mino-scout check` 自检 |
-| `run-test-cases` | CLI 验本机 → MCP 触发跑数 → 对话汇报 |
-| `update-skills` | 更新技能与反馈 |
+| `run-test-cases` | CLI 验本机 → MCP 跑数 → 汇报 |
+| `update-skills` | 从 GitHub 安装/更新技能（Cursor：**禁止软链**） |
 
 推荐顺序：`overview` → `onboarding` → `repo-config` → `write-test-cases` → `check-test-cases` → `run-test-cases`。
 
-## 安装给 agent
+## 安装给 Cursor
 
-把下面发给你正在用的 agent，按它惯用方式安装。技能在仓库 `skills/`。
+从 GitHub **复制**到 `~/.cursor/skills/`（真实目录，不要软链到本机开发仓）。步骤见技能 `update-skills`。
 
-> 帮我安装这个 Skill：https://github.com/pengchengluoyi/mino.git  
-> 装好后按技能 `onboarding` 带我完成注册、OAuth 接 MCP、安装 Scout，再配置项目与脚本仓。
+也可对 agent 说：
 
-装完后**新开一个会话**再生效。版本见根目录 `VERSION`、`CHANGELOG.md`。
+> 帮我从 https://github.com/pengchengluoyi/mino.git 安装 Mino Skill 到 ~/.cursor/skills（复制，不要软链）。装好后按 onboarding 带我上手。
+
+装完后**新开一个会话**。版本见已装目录里的 `VERSION`、`CHANGELOG.md`。
 
 ## 更新
 
-见 `update-skills`：在 mino 检出里 `git pull`，不要复制技能文件到 agent 目录。
+再跑一遍 `update-skills` 里的安装命令（重新 clone + 覆盖复制）。不要 `ln -s` 到 `code/mino`。
 
 ## 前提
 
-- 本机将安装并运行 MinoScout（流程在 `onboarding`，用 `mino-scout` CLI 验收）；
-- agent 已接 Nexus MCP：`https://nexus.minocc.top/mcp`（先调 `agent_guide`）；
-- Workbench：`https://workbench.minocc.top`（注册、OAuth、生成 Scout 安装命令）；
-- `write-test-cases` 方法以本机 `mino_scout/runtime/script_exec.py` 为准。
+- Scout：按 `onboarding` 用 MCP 申请安装命令并确认后安装，CLI 验收；  
+- MCP：`https://nexus.minocc.top/mcp`（先 `agent_guide`）；  
+- Workbench：`https://workbench.minocc.top`；  
+- 写作用法以本机 `mino_scout/runtime/script_exec.py` 为准。
 
 ## 目录规范
 
-- 目录名等于 `SKILL.md` 的 `name`；
+- 目录名等于 `SKILL.md` 的 `name`；  
 - `SKILL.md` 文件名全大写。
