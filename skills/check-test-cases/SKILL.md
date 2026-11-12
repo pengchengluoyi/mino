@@ -23,7 +23,7 @@ mino-scout check .
 | `prep_missing` | `tests/` 里的用例没有 `prep` | 写 `case.nexus.prep("做了什么")`。确实不用做，标题写为什么，这句话会写入 Nexus |
 | `prep_reason` | 前置标题只有「无」这类空话 | 写清做了什么；确实不用做，就写为什么 |
 | `config_missing` | 脚本用了 `config.yaml` 里没有的应用，或没有 `config.yaml` | 补 `config.yaml`，参见 `repo-config` |
-| `config_invalid` | `config.yaml` 格式不对 | 顶层 `apps`，每个应用要有 `platform` 和 `app_id`，key 以英文字母开头 |
+| `config_invalid` | `config.yaml` 格式不对 | 顶层 `apps`，每个应用要有 `platform`，key 以英文字母开头；不要写 `app_id`；可选 `otp.code` 必须是字符串 |
 | `page_layout` | 页面文件位置不对 | 放到 `pages/<APP_KEY>/` 下，目录名等于 `config.yaml` 里的 key |
 
 注意：

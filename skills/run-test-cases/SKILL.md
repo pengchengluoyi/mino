@@ -60,6 +60,7 @@ Nexus 管用例、设备、账号、任务、会话；Scout 在用户电脑上�
 | `method_unknown` | 方法名写错，报错里有最相近的名字；改脚本 |
 | `config_missing` | 脚本仓库的 `config.yaml` 缺这个应用或这个环境，见 `repo-config` |
 | `app_not_in_repo_config` | Nexus 里没有同步这个应用，见 `repo-config` §3 |
+| `otp_requires_human` | 账号无自带码且 `config.yaml` 未写 `otp.code`；向用户要本次验证码，或写入测试用 `otp.code` 后 push 再跑 |
 | `vlm_failed` | 视觉判定未通过，看 `script/note` 和截图，再判断是产品问题还是判定词问题 |
 | `revision_missing` | Scout 在仓库里取不到这个提交：确认已 push；不要回退到分支最新 |
 | `repo_unavailable` | 设备所在电脑拉不到仓库：本机没有 git，或没有该仓库的 git 凭据；让用户处理那台电脑 |

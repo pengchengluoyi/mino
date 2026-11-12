@@ -2,6 +2,15 @@
 
 每个版本写清需要的 Scout / Nexus 版本。技能说的和实际对不上时，先核对这里。
 
+## 0.1.7
+
+- 脚本仓优先：`config.yaml` 只认应用 key，**不再要求 `app_id` / `project_id`**；`repo_apps_sync` 可不传 `app_id`，Nexus 按 key 对齐或自动创建应用。
+- MCP 边界写清：只通信（查询、同步元数据、触发跑数），不写脚本；脚本由 agent 本机编写并 Git 推送。
+- 固定验证码迁到脚本仓：可选 `otp.code`；不写则 `case.scout.otp` 报 `otp_requires_human`，向人要码。同步载荷禁止带 `otp`。
+- 登录动作仍在 `flows/`；账号仍由 Nexus 号池租用。
+
+需要 Scout 0.1.141、Nexus 0.1.80。
+
 ## 0.1.6
 
 - 技能安装：把仓库地址交给 agent，按该 agent 惯用方式安装（技能在 `skills/`）。

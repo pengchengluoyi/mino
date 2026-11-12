@@ -53,7 +53,7 @@ def run(case):
 - 前置里的「清理缓存 / 清除缓存 / 清除应用数据」，Android 用 `app.clear_cache()`。iOS 上这个方法会 `declined`，不要换别的命令绕过去，做不到就停下问；
 - 一个 `with` 块里只放这一步的动作；失败时 Workbench 定位到这个 title；
 - 补充证据用 `case.nexus.note("文字", 键=值)`，不要 `print`；
-- 账号一律 `case.nexus.account()` 取（Nexus 号池租用），仓库任何文件都不写账号、密码、验证码。验证码用 `case.scout.otp(account)`，它按这个账号的登录策略取（账号自带码 / 固定码 / Gmail），不要自己规定渠道。
+- 账号一律 `case.nexus.account()` 取（Nexus 号池租用），仓库不写账号、密码。测试用固定验证码只写在 `config.yaml` 的 `otp.code`（见 `repo-config`）。验证码用 `case.scout.otp(account)`：账号自带码 → 脚本仓 `otp.code` → 否则 `otp_requires_human`，停下向人要，不要自己规定渠道或猜码。
 
 ## 3. `app` 的方法与渠道支持
 
@@ -110,7 +110,7 @@ def run(case):
 | 不要写 | 改用 |
 |---|---|
 | `time.sleep(...)` | `case.scout.wait(ms)` |
-| `imaplib` / `poplib` 取验证码 | `case.scout.otp(account)`（按账号策略：自带码 / 固定码 / Gmail） |
+| `imaplib` / `poplib` 取验证码 | `case.scout.otp(account)`（账号自带码 / `config.yaml` 的 `otp.code` / 否则问人） |
 | `openai` / `anthropic` 调模型 | `case.scout.llm()` / `app.vlm()` |
 | `subprocess`、`os.system`、`exec`、`eval` | `app.exec()` |
 | `adbutils`、`playwright`、`appium` 等设备库 | `app.*` |
@@ -130,7 +130,7 @@ def run(case):
    - 已存在：`git fetch` 后 `git pull --ff-only`；
    - 有未提交改动、有未 push 提交、或 ff 失败：**停下问用户**，不 `reset --hard`，不 force。
 3. 选设备：按 `run-test-cases` 调 `device_list`，只选 `executable=true` 且平台与用例一致的一台。没有就停下，**不要按用例正文编 `locator_spec`**。写这一条期间一直用这台设备。
-4. 按 `repo-config` 补目录。缺应用就先补 `config.yaml` 和 `pages/<KEY>/`。**改了 `config.yaml` 的话，push 后要调 `repo_apps_sync`**（见 `repo-config` §3）。
+4. 按 `repo-config` 补目录。缺应用就先在 `config.yaml` 加 key（不要写 `app_id`）并建 `pages/<KEY>/`。**改了应用身份字段的话，push 后要调 `repo_apps_sync`**（只传 platform 与包名/URL，不要传 `otp`；见 `repo-config` §3）。Nexus 会按 key 对齐或自动创建应用。
 5. 在 `tests/<需求ID>/<case_id>.py` 里用 Scout 把路径走通，再落成可执行脚本。同一份文件改一轮、跑一轮：
    - 还没有真实定位时，脚本只做到达这一屏所必需的事，并调用 `app.hierarchy()` 和 `app.screenshot()`。能用已写好的 `page_key.control_id` 就 `tap` / `input`，没有定位就不点；
    - `check-test-cases` 通过后 commit 并 push，用上一步的设备 `case_run`（`run-test-cases`）；

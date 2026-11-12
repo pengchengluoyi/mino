@@ -9,19 +9,21 @@ Mino 是一套自动化测试系统：由 AI 写测试脚本，在真实设备�
 
 | 端 | 是什么 | 负责 | 不负责 |
 |---|---|---|---|
-| **Nexus** | 云端服务（`https://nexus.minocc.top`），大脑 | 用例、项目与仓库配置、设备与账号资源、任务与会话、事件存储、触发任务并把仓库地址 / 提交 / 设备下发给 Scout、对 Workbench 和 agent（MCP）供数 | 直接操作设备；读写或打包脚本仓库；保存 Git 令牌 |
-| **Scout** | 执行器，手脚，装在有设备的电脑上 | 接收 Nexus 下发的任务，**自己用本机 git 拉取脚本仓库**、读 `config.yaml`、跑脚本，操作本机设备，截图取证，回报结果；本机取验证码和调视觉模型 | 存业务数据；选用例；分配账号；决定“下一步做什么” |
+| **Nexus** | 云端服务（`https://nexus.minocc.top`），大脑 | 用例、项目与仓库配置、设备与账号资源、任务与会话、事件存储、触发任务并把仓库地址 / 提交 / 设备下发给 Scout、对 Workbench 和 agent（MCP）供数；按脚本仓 key 对齐 `app_id` | 直接操作设备；读写或打包脚本仓库；保存 Git 令牌；托管固定验证码 |
+| **Scout** | 执行器，手脚，装在有设备的电脑上 | 接收 Nexus 下发的任务，**自己用本机 git 拉取脚本仓库**、读 `config.yaml`（含可选 `otp.code`）、跑脚本，操作本机设备，截图取证，回报结果；本机取验证码和调视觉模型 | 存业务数据；选用例；分配账号；决定“下一步做什么” |
 | **Workbench** | 网页前端（`https://workbench.minocc.top`），由 Nexus 提供 | 管理项目、用例、环境、控件，查看任务、会话和证据 | 执行、写脚本 |
+| **Agent + MCP** | 对话侧 | agent 写脚本并 Git 推送；MCP 只查询、同步应用清单、触发跑数 | MCP 不写代码、不改脚本仓 |
 
 用户电脑上安装的只有 Scout；本地状态（如脚本工作区）放在 `~/.mino/`。Scout 永远是主动连向 Nexus 的一方，不开放监听端口。一台 Scout 可以挂多台本机设备。MCP 入口：`https://nexus.minocc.top/mcp`。
 
 ## 一次测试的流向
 
 1. 用例在 Nexus（Workbench 里维护）；
-2. agent 通过 Nexus 的 MCP 工具读用例，在本机写脚本并 push 到项目的 Git 仓库；
-3. agent 调 `case_run`，Nexus 只触发任务：把仓库地址、分支、提交、环境、设备下发给设备所在的 Scout；
-4. Scout 自己拉取该提交的脚本仓库（用本机 git 凭据），在设备上执行，步骤和证据写回 Nexus；
-5. 用户在 Workbench 看过程和结果，agent 在对话里简要汇报。
+2. agent 通过 MCP 读用例，在本机写 `config.yaml` / 脚本并 push（脚本仓用 key，不写 `app_id`）；
+3. 改了应用清单则 `repo_apps_sync`，Nexus 按 key 对齐或自动创建应用；
+4. agent 调 `case_run`，Nexus 只触发任务：把仓库地址、分支、提交、环境、设备、`app_key` 下发给设备所在的 Scout；
+5. Scout 自己拉取该提交的脚本仓库（用本机 git 凭据），在设备上执行，步骤和证据写回 Nexus；
+6. 用户在 Workbench 看过程和结果，agent 在对话里简要汇报。
 
 ## 该用哪个技能
 
